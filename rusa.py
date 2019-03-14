@@ -195,8 +195,6 @@ train_store['clusterWeek'][sum([train_store['WeekOfYear']== i for i in num2])==1
 train_store[train_store['clusterWeek'] == 0]
 
 
-%matplotlib qt
-
 corr0 = train_store[train_store['clusterWeek'] == 0].drop('Open', axis = 1).corr()
 corr1 = train_store[train_store['clusterWeek'] == 1].drop('Open', axis = 1).corr()
 corr2 = train_store[train_store['clusterWeek'] == 2].drop('Open', axis = 1).corr()
@@ -240,7 +238,76 @@ corr1['Promo2']
 corr2['Promo2']
 corr_all['Promo2']
 
+#########################
+#########################
 
+train_store_cluster0=train_store['clusterWeek']==0
+
+cluster0=train_store[train_store_cluster0]
+
+cluster0.head()
+
+
+sns.factorplot(data = cluster0, x = 'DayOfWeek', y = "Sales", 
+               col = 'Assortment',# per store type in cols
+               row  = 'StoreType',
+               palette = 'plasma',
+               hue = 'Assortment')
+
+
+train_store_cluster1=train_store['clusterWeek']==1
+
+cluster1=train_store[train_store_cluster1]
+
+cluster1.head()
+
+
+sns.factorplot(data = cluster1, x = 'DayOfWeek', y = "Sales", 
+               col = 'Assortment',# per store type in cols
+               row  = 'StoreType',
+               palette = 'plasma',
+               hue = 'Assortment')
+
+
+train_store_cluster2=train_store['clusterWeek']==2
+
+cluster2=train_store[train_store_cluster2]
+
+cluster2.head()
+
+
+sns.factorplot(data = cluster2, x = 'DayOfWeek', y = "Sales", 
+               col = 'Assortment',# per store type in cols
+               row  = 'StoreType',
+               palette = 'plasma',
+               hue = 'Assortment')
+
+
+##########################
+##########################
+
+
+train_store_2013=train_store['Year']==2013
+
+TS_Yeat2013=train_store[train_store_2013]
+
+l=sns.factorplot(data = TS_Yeat2013, x = 'DayOfWeek', y = "Sales", 
+               col = 'Assortment',# per store type in cols
+               row  = 'StoreType',
+               palette = 'plasma',
+               hue = 'Assortment')
+print(train_store['Year'])
+##### Segmentation Assortment- Store type-Perrito #############
+####################################################################
+## Segmentation week perrito ########################################
+###################################################################
+M_asso = np.zeros([12,7])
+ass_Type=train_store['Assortment'].unique()
+sto_Type=train_store['StoreType'].unique() 
+#couples=[[i,j] for i in ass_Type  for j in sto_Type]
+M_asso = [[(train_store[(train_store['Assortment'] == i) & (train_store['StoreType'] == k) & (train_store['DayOfWeek'] == j)]['Sales']).mean() for j in range(1,8)] for i in ass_Type for k in sto_Type]
+ 
+bool_M = [[M_asso[j][i] >= 0 for i in range(0,7)] for j in range(0,12)] 
 
 
 
