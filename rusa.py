@@ -307,8 +307,22 @@ sto_Type=train_store['StoreType'].unique()
 #couples=[[i,j] for i in ass_Type  for j in sto_Type]
 M_asso = [[(train_store[(train_store['Assortment'] == i) & (train_store['StoreType'] == k) & (train_store['DayOfWeek'] == j)]['Sales']).mean() for j in range(1,8)] for i in ass_Type for k in sto_Type]
  
-bool_M = [[M_asso[j][i] >= 0 for i in range(0,7)] for j in range(0,12)] 
+M_asso = np.nan_to_num(np.asarray(M_asso))
 
+row_zeros = np.where((M_asso==0).all(axis=1)==True)
 
+M_asso1 = np.delete(M_asso,row_zeros)
+#######Elegimos el # de clusters como a Hernan le dio la puta gana: necesitamos una manera metódica 
+#######de fijar ese numero
+kmeans_store = KMeans(n_clusters=4)
 
+kmeans_store.fit(M_asso)
+centros_store = kmeans_store.cluster_centers_
+
+clusters_store = kmeans.fit_predict(M_asso)
+
+num0 = [i+1 for i in range(0,12) if (clusters_store[i] == 0)]
+num1 = [i+1 for i in range(0,12) if (clusters_store[i] == 1)]
+num2 = [i+1 for i in range(0,12) if (clusters_store[i] == 2)]
+num3 = [i+1 for i in range(0,12) if (clusters_store[i] == 3)]
 
