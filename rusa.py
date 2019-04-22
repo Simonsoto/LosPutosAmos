@@ -1,16 +1,9 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Feb 28 15:49:20 2019
-
-@author: labmatematicas
-"""
-
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import sklearn
+#from sklearn import
 from pandas import datetime
 from sklearn.cluster import KMeans
 
@@ -167,8 +160,9 @@ sns.factorplot(data = train_store, x = 'DayOfWeek', y = "Sales",
                palette = 'plasma',
                hue = 'StoreType',row = 'StoreType')
 
-##############################
-##############################
+####################################################################
+## Segmentatin week perrito ########################################
+###################################################################
 M_weeks = np.zeros([7,52])
 
 M_weeks = [[(train_store[(train_store['WeekOfYear'] == j) & (train_store['DayOfWeek'] == i)]['Sales']).mean() for i in range(1,8)] for j in range(1,53)]
@@ -184,7 +178,7 @@ num0 = [i+1 for i in range(0,52) if (clusters[i] == 0)]
 num1 = [i+1 for i in range(0,52) if (clusters[i] == 1)]
 num2 = [i+1 for i in range(0,52) if (clusters[i] == 2)]
 
-train_store['WeekOfYear'].index(num0)
+#train_store['WeekOfYear'].index(num0)
 
 train_store['clusterWeek'] = 0*train_store['Sales']
 
@@ -194,6 +188,7 @@ train_store['clusterWeek'][sum([train_store['WeekOfYear']== i for i in num2])==1
 
 train_store[train_store['clusterWeek'] == 0]
 
+########
 
 corr0 = train_store[train_store['clusterWeek'] == 0].drop('Open', axis = 1).corr()
 corr1 = train_store[train_store['clusterWeek'] == 1].drop('Open', axis = 1).corr()
@@ -291,39 +286,50 @@ train_store_2013=train_store['Year']==2013
 
 TS_Yeat2013=train_store[train_store_2013]
 
-l=sns.factorplot(data = TS_Yeat2013, x = 'DayOfWeek', y = "Sales", 
+l=sns.factorplot(data = train_store, x = 'DayOfWeek', y = "Sales", 
                col = 'Assortment',# per store type in cols
                row  = 'StoreType',
                palette = 'plasma',
                hue = 'Assortment')
 print(train_store['Year'])
+
 ##### Segmentation Assortment- Store type-Perrito #############
 ####################################################################
 ## Segmentation week perrito: para cada cluster generado po WeekOf Year
 ##generamos tres clusters nuevos. Las variables de los tres nuevos clusters son ['Assortment','StoreType']
 ###################################################################
+train_store['clusterAssType']=0*train_store['Sales']
 ass_Type=train_store['Assortment'].unique()
-sto_Type=train_store['StoreType'].unique() 
-#couples=[[i,j] for i in ass_Type  for j in sto_Type]
+sto_Type=train_store['StoreType'].unique()
+ 
+# Parejas de Assortment Store Type 
+couples=[[i,j] for i in ass_Type  for j in sto_Type]
+
 train_store0 = train_store[train_store['clusterWeek'] == 0]
-M_asso0 = [[(train_store0[(train_store0['Assortment'] == i) & (train_store0['StoreType'] == k) & (train_store0['DayOfWeek'] == j)]['Sales']).mean() for j in range(1,8)] for i in ass_Type for k in sto_Type]
+
+M_asso0 = [[(train_store0[(train_store0['Assortment'] == c[0]) & (train_store0['StoreType'] == c[1]) & (train_store0['DayOfWeek'] == j)]['Sales']).mean() for j in range(1,8)] for c in couples]
  
 M_asso0 = np.nan_to_num(np.asarray(M_asso0))
 
-row_zeros = np.where((M_asso0==0).all(axis=1)==True)
+#row_zeros = np.where((M_asso0==0).all(axis=1)==True)
 
-M_asso = np.delete(M_asso0,row_zeros,axis = 0)
+#M_asso = np.delete(M_asso0,row_zeros,axis = 0)
 
 #######Elegimos el # de clusters como a Hernan le dio la puta gana: necesitamos una manera metódica 
 #######de fijar ese numero
-kmeans_store = KMeans(n_clusters=3)
+kmeans_store = KMeans(n_clusters=4)
 
-kmeans_store.fit(M_asso)
+kmeans_store.fit(M_asso0)
 centros_store = kmeans_store.cluster_centers_
 
-clusters_store = kmeans.fit_predict(M_asso)
+clusters_store = kmeans.fit_predict(M_asso0)
 
-num0 = [i+1 for i in range(0,len(M_asso)) if (clusters_store[i] == 0)]
-num1 = [i+1 for i in range(0,len(M_asso)) if (clusters_store[i] == 1)]
-num2 = [i+1 for i in range(0,len(M_asso)) if (clusters_store[i] == 2)]
+num0 = [i for i in range(0,len(M_asso0)) if (clusters_store[i] == 0)]
+num1 = [i for i in range(0,len(M_asso0)) if (clusters_store[i] == 1)]
+num2 = [i for i in range(0,len(M_asso0)) if (clusters_store[i] == 2)]
+
+
+
+
+
 
